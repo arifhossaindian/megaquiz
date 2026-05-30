@@ -48,6 +48,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
+            margin-top: 12vh;   /* ব্ল্যাক হোল বড় হওয়ায় লেখাকে আরও নিচে সরানো */
         }
         h1 {
             font-size: 2.2rem;
@@ -178,10 +179,10 @@
 
     <script>
         // if ('serviceWorker' in navigator) {
-//     window.addEventListener('load', () => {
-//         navigator.serviceWorker.register('sw.js').catch(() => {});
-//     });
-// }
+        //     window.addEventListener('load', () => {
+        //         navigator.serviceWorker.register('sw.js').catch(() => {});
+        //     });
+        // }
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -207,7 +208,7 @@
             const mainBH = { x: 0, y: 0, eventHorizonRadius: 30, mass: 5000, photonRingRadius: 35 };
             let stars = [];
             const STAR_COUNT = 600;
-            const LARGE_STAR_COUNT = 6; // exactly 6 large stars (2x size)
+            const LARGE_STAR_COUNT = 6;
 
             let diskParticles = [];
             const DISK_PARTICLE_COUNT = 180;
@@ -288,8 +289,9 @@
                 w = window.innerWidth;
                 h = window.innerHeight;
                 mainBH.x = w * 0.5;
-                mainBH.y = h * 0.35;
-                mainBH.eventHorizonRadius = Math.min(w, h) * 0.048;
+                mainBH.y = h * 0.30;
+                // আগের ২০% বৃদ্ধি (0.048 → 0.0576) + আরও ৪০% বৃদ্ধি (0.0576 × 1.4 = 0.08064)
+                mainBH.eventHorizonRadius = Math.min(w, h) * 0.08064;
                 mainBH.photonRingRadius = mainBH.eventHorizonRadius * 1.18;
                 mainBH.mass = mainBH.eventHorizonRadius * 160;
                 createStars();
@@ -309,7 +311,6 @@
                     const typeRand = Math.random();
                     let x, y, vx, vy;
                     const baseSize = Math.random() * 1.8 + 0.3;
-                    // default size multiplier 1
                     let sizeMultiplier = 1;
 
                     if (typeRand < orbitalFraction) {
@@ -339,14 +340,13 @@
                     stars.push({
                         x, y, vx, vy,
                         size: baseSize,
-                        sizeMultiplier: sizeMultiplier, // will set some to 2 later
+                        sizeMultiplier: sizeMultiplier,
                         brightness: Math.random(),
                         twinkleSpeed: Math.random() * 0.015 + 0.004,
                         twinkleOffset: Math.random() * Math.PI * 2,
                     });
                 }
 
-                // Mark exactly LARGE_STAR_COUNT random stars as 2x size
                 const indices = Array.from({length: STAR_COUNT}, (_, i) => i);
                 for (let i = indices.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
