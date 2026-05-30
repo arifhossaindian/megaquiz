@@ -933,7 +933,7 @@
             </section>
             <div class="footer-contact" id="footerContact">📧 arifbeldanga@gmail.com &nbsp;|&nbsp; 💬 Telegram: @beldanga1</div>
             <section class="edit-section-bottom">
-                <div class="edit-header-bottom" id="editHeaderBottom"><span>✏️ Edit (Add/Delete Questions - Password required)</span><span>▼</span></div>
+                <div class="edit-header-bottom" id="editHeaderBottom"><span>✏️ Edit</span><span>▼</span></div>
                 <div class="edit-body-bottom" id="editBodyBottom">
                     <div id="editContent" style="display: none; margin-top: 12px;">
                         <div class="subject-mgmt-header" id="subjectGroupMgmtHeader"><span>📂 Manage Subjects</span><span>▼</span></div>
@@ -1876,7 +1876,7 @@
             }
 
             function clearSelectedSubjects() { if (!isEditUnlocked) { const p = prompt(
-                        "Clear Chapters করতে edit password দিন:"); if (normalizePassword(p) !== EDIT_PASSWORD) return showError(
+                        "Clear Chapters করতে password দিন:"); if (normalizePassword(p) !== EDIT_PASSWORD) return showError(
                         "Password ভুল。");
                     isEditUnlocked = true; } const ks = getSelectedKeys(); if (!ks.length) return showError(
                     "No chapter selected!"); const t = ks.reduce((s, k) => s + getCount(k), 0); if (!t) return showError(
