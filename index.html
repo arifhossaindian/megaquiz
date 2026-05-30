@@ -48,7 +48,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 12vh;   /* ব্ল্যাক হোল বড় হওয়ায় লেখাকে আরও নিচে সরানো */
+            margin-top: 12vh;
         }
         h1 {
             font-size: 2.2rem;
@@ -207,8 +207,10 @@
 
             const mainBH = { x: 0, y: 0, eventHorizonRadius: 30, mass: 5000, photonRingRadius: 35 };
             let stars = [];
-            const STAR_COUNT = 600;
-            const LARGE_STAR_COUNT = 6;
+            const STAR_COUNT = 800; // বেড়ে ৮০০ তারা (আগে ৬৬০)
+            const ORBITAL_STAR_COUNT = 600; // ব্ল্যাক হোলের চারপাশের তারা
+            const BACKGROUND_STAR_COUNT = 200; // সম্পূর্ণ স্ক্রিনে স্থির ছোট তারা
+            const LARGE_STAR_COUNT = 6; // ৬টি বড় তারা (2x size)
 
             let diskParticles = [];
             const DISK_PARTICLE_COUNT = 180;
@@ -290,7 +292,6 @@
                 h = window.innerHeight;
                 mainBH.x = w * 0.5;
                 mainBH.y = h * 0.30;
-                // আগের ২০% বৃদ্ধি (0.048 → 0.0576) + আরও ৪০% বৃদ্ধি (0.0576 × 1.4 = 0.08064)
                 mainBH.eventHorizonRadius = Math.min(w, h) * 0.08064;
                 mainBH.photonRingRadius = mainBH.eventHorizonRadius * 1.18;
                 mainBH.mass = mainBH.eventHorizonRadius * 160;
@@ -304,58 +305,57 @@
                 stars = [];
                 const bh = mainBH;
                 const clusterRadius = Math.min(w, h) * 0.6;
-                const orbitalFraction = 0.80;
-                const staticFraction = 0.15;
+                const minDist = bh.eventHorizonRadius * 1.5;
 
-                for (let i = 0; i < STAR_COUNT; i++) {
-                    const typeRand = Math.random();
-                    let x, y, vx, vy;
-                    const baseSize = Math.random() * 1.8 + 0.3;
-                    let sizeMultiplier = 1;
-
-                    if (typeRand < orbitalFraction) {
-                        const angle = Math.random() * Math.PI * 2;
-                        const dist = bh.eventHorizonRadius * 2.0 + Math.pow(Math.random(), 0.5) * (clusterRadius - bh.eventHorizonRadius * 2);
-                        x = bh.x + Math.cos(angle) * dist;
-                        y = bh.y + Math.sin(angle) * dist;
-                        const v_orbit = Math.sqrt(bh.mass * 0.03 / dist);
-                        const tx = -Math.sin(angle);
-                        const ty = Math.cos(angle);
-                        vx = tx * v_orbit;
-                        vy = ty * v_orbit;
-                    } else if (typeRand < orbitalFraction + staticFraction) {
-                        const angle = Math.random() * Math.PI * 2;
-                        const dist = clusterRadius * 1.1 + Math.random() * (Math.max(w, h) * 0.5 - clusterRadius * 1.1);
-                        x = bh.x + Math.cos(angle) * dist;
-                        y = bh.y + Math.sin(angle) * dist;
-                        vx = (Math.random() - 0.5) * 0.05;
-                        vy = (Math.random() - 0.5) * 0.05;
-                    } else {
-                        x = Math.random() * w;
-                        y = Math.random() * h;
-                        vx = (Math.random() - 0.5) * 0.5;
-                        vy = (Math.random() - 0.5) * 0.5;
-                    }
-
+                // ===== ১. অরবিটাল তারা (ঘন, ব্ল্যাক হোলের চারদিকে) =====
+                for (let i = 0; i < ORBITAL_STAR_COUNT; i++) {
+                    const angle = Math.random() * Math.PI * 2;
+                    const dist = minDist + Math.pow(Math.random(), 0.2) * (clusterRadius - minDist);
+                    const x = bh.x + Math.cos(angle) * dist;
+                    const y = bh.y + Math.sin(angle) * dist;
+                    const v_orbit = Math.sqrt(bh.mass * 0.06 / dist);
+                    const tx = -Math.sin(angle);
+                    const ty = Math.cos(angle);
+                    const vx = tx * v_orbit;
+                    const vy = ty * v_orbit;
                     stars.push({
                         x, y, vx, vy,
-                        size: baseSize,
-                        sizeMultiplier: sizeMultiplier,
+                        size: Math.random() * 1.8 + 0.3,
                         brightness: Math.random(),
                         twinkleSpeed: Math.random() * 0.015 + 0.004,
                         twinkleOffset: Math.random() * Math.PI * 2,
+                        isBackground: false,
+                        sizeMultiplier: 1
                     });
                 }
 
-                const indices = Array.from({length: STAR_COUNT}, (_, i) => i);
+                // ===== ২. ব্যাকগ্রাউন্ড তারা (সম্পূর্ণ স্ক্রিনে স্থির, ছোট) =====
+                for (let i = 0; i < BACKGROUND_STAR_COUNT; i++) {
+                    const x = Math.random() * w;
+                    const y = Math.random() * h;
+                    stars.push({
+                        x, y,
+                        vx: 0, vy: 0,          // একেবারে স্থির
+                        size: Math.random() * 0.6 + 0.2, // খুব ছোট (0.2–0.8)
+                        brightness: Math.random(),
+                        twinkleSpeed: Math.random() * 0.01 + 0.002,
+                        twinkleOffset: Math.random() * Math.PI * 2,
+                        isBackground: true,    // গুরুত্বপূর্ণ ফ্ল্যাগ
+                        sizeMultiplier: 1
+                    });
+                }
+
+                // ৬টি বড় তারা (2x size) র‍্যান্ডমভাবে নির্বাচন (শুধু অরবিটালদের মধ্য থেকে)
+                const orbitalStars = stars.filter(s => !s.isBackground);
+                const indices = Array.from({length: orbitalStars.length}, (_, i) => i);
                 for (let i = indices.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [indices[i], indices[j]] = [indices[j], indices[i]];
                 }
                 for (let k = 0; k < LARGE_STAR_COUNT; k++) {
                     const idx = indices[k];
-                    if (stars[idx]) {
-                        stars[idx].sizeMultiplier = 2;
+                    if (idx !== undefined && orbitalStars[idx]) {
+                        orbitalStars[idx].sizeMultiplier = 2;
                     }
                 }
             }
@@ -389,11 +389,17 @@
                 return all;
             }
 
+            // gravity: ব্যাকগ্রাউন্ড তারাদের জন্য কোনো প্রভাব নেই
             function applyGravity(star, allBH) {
+                if (star.isBackground) return; // 👈 স্থির, কোনো গ্র্যাভিটি নয়
+
                 for (const bh of allBH) {
                     const dx = bh.x - star.x;
                     const dy = bh.y - star.y;
                     const dist = Math.sqrt(dx * dx + dy * dy);
+                    const influenceRadius = bh.radius * 8;
+                    if (dist > influenceRadius) continue;
+
                     const isUserBH = bh.ref && bh.ref.alive;
                     const forceMultiplier = isUserBH ? 3.5 : 1.0;
                     const minDist = bh.radius * 1.6;
@@ -406,6 +412,25 @@
                         star.vx += (dx / dist) * force;
                         star.vy += (dy / dist) * force;
                     }
+
+                    if (dist < bh.radius * 6 && dist > bh.radius * 1.2) {
+                        const radialDirX = dx / dist;
+                        const radialDirY = dy / dist;
+                        const tangentialDirX = -radialDirY;
+                        const tangentialDirY = radialDirX;
+
+                        const vRadial = star.vx * radialDirX + star.vy * radialDirY;
+                        const vTangential = star.vx * tangentialDirX + star.vy * tangentialDirY;
+                        const vCirc = Math.sqrt(bh.mass * 0.06 / dist);
+                        const minTangential = vCirc * 0.6;
+                        const newTangential = Math.max(Math.abs(vTangential), minTangential) * Math.sign(vTangential || 1);
+                        const maxInfallSpeed = vCirc * 0.5;
+                        const newRadial = Math.max(vRadial, -maxInfallSpeed);
+
+                        star.vx = radialDirX * newRadial + tangentialDirX * newTangential;
+                        star.vy = radialDirY * newRadial + tangentialDirY * newTangential;
+                    }
+
                     if (dist < bh.radius * 0.75 && bh.radius > 2) {
                         if (bh.ref && bh.ref.alive) {
                             respawnStarFromEdge(star, bh.ref);
@@ -481,14 +506,18 @@
                 const allBH = getAllBlackHoles();
                 for (const star of stars) {
                     applyGravity(star, allBH);
-                    applyMouseRepulsion(star);
-                    star.vx *= 0.999;
-                    star.vy *= 0.999;
-                    const speed = Math.sqrt(star.vx * star.vx + star.vy * star.vy);
-                    if (speed > 5.5) {
-                        const scale = 5.5 / speed;
-                        star.vx *= scale;
-                        star.vy *= scale;
+                    if (!star.isBackground) {
+                        applyMouseRepulsion(star); // ব্যাকগ্রাউন্ড তারা মাউস দ্বারা প্রভাবিত হবে না
+                    }
+                    if (!star.isBackground) {
+                        star.vx *= 0.999;
+                        star.vy *= 0.999;
+                        const speed = Math.sqrt(star.vx * star.vx + star.vy * star.vy);
+                        if (speed > 5.5) {
+                            const scale = 5.5 / speed;
+                            star.vx *= scale;
+                            star.vy *= scale;
+                        }
                     }
                     star.x += star.vx;
                     star.y += star.vy;
@@ -732,9 +761,9 @@
             function renderStars() {
                 for (const star of stars) {
                     const twinkle = 0.5 + 0.5 * Math.sin(Date.now() * star.twinkleSpeed + star.twinkleOffset);
-                    const alpha = 0.4 + star.brightness * 0.45 + twinkle * 0.2;
+                    const alpha = Math.min(1, 0.3 + star.brightness * 0.3 + twinkle * 0.45);
                     const renderSize = star.size * (star.sizeMultiplier || 1);
-                    ctx.fillStyle = `rgba(255,255,255,${Math.min(1,alpha)})`;
+                    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
                     ctx.beginPath();
                     ctx.arc(star.x, star.y, renderSize, 0, Math.PI * 2);
                     ctx.fill();
