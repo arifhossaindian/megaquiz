@@ -202,44 +202,33 @@
 
             const mainBH = { x: 0, y: 0, eventHorizonRadius: 30, mass: 5000, photonRingRadius: 35 };
             let stars = [];
-            // ২৫% কমানো হয়েছে
-            const ORBITAL_STAR_COUNT = 495;      // 660 → 495
-            const BACKGROUND_STAR_COUNT = 240;    // 320 → 240
-            const CORNER_STARS_COUNT = 15;        // 20 → 15
+            const ORBITAL_STAR_COUNT = 495;
+            const BACKGROUND_STAR_COUNT = 240;
+            const CORNER_STARS_COUNT = 15;
             const LARGE_STAR_COUNT = 8;
 
             let diskParticles = [];
             const DISK_PARTICLE_COUNT = 180;
             const DISK_VIEW_ANGLE = Math.PI / 3.2;
 
-            let userBlackHoles = [];
-
+            // mouse state simplified – only repel, no hold/create
             const mouse = {
-                x: -9999, y: -9999,
-                down: false,
-                holdStartTime: 0,
-                holdX: -9999, holdY: -9999,
-                holding: false,
-                activeGrowingBH: null,
-                lastClickTime: 0,
-                lastClickX: -9999, lastClickY: -9999,
-                isTouch: false,
+                x: -9999, y: -9999
             };
 
             let planets = [];
             let nebulae = [];
 
             // সাদা তারার অনুপাত প্রতিবার ৭৫% থেকে ৮৫% এর মধ্যে র্যান্ডম হবে
-            const whiteStarProbability = 0.75 + Math.random() * 0.10; // 75% – 85%
+            const whiteStarProbability = 0.75 + Math.random() * 0.10;
 
-            // নন-হোয়াইট রঙের প্যালেট
             const nonWhitePalette = [
-                { color: { r: 255, g: 220, b: 100 }, weight: 10 },  // হলুদ
-                { color: { r: 180, g: 210, b: 255 }, weight: 7 },   // নীল
-                { color: { r: 255, g: 180, b: 80 }, weight: 5 },    // কমলা
-                { color: { r: 255, g: 100, b: 70 }, weight: 4 },    // লাল
-                { color: { r: 150, g: 220, b: 180 }, weight: 3 },   // সায়ান
-                { color: { r: 220, g: 200, b: 255 }, weight: 1 }    // বেগুনি
+                { color: { r: 255, g: 220, b: 100 }, weight: 10 },
+                { color: { r: 180, g: 210, b: 255 }, weight: 7 },
+                { color: { r: 255, g: 180, b: 80 }, weight: 5 },
+                { color: { r: 255, g: 100, b: 70 }, weight: 4 },
+                { color: { r: 150, g: 220, b: 180 }, weight: 3 },
+                { color: { r: 220, g: 200, b: 255 }, weight: 1 }
             ];
             const totalNonWhiteWeight = nonWhitePalette.reduce((sum, item) => sum + item.weight, 0);
 
@@ -249,12 +238,12 @@
                     rand -= item.weight;
                     if (rand <= 0) return item.color;
                 }
-                return { r: 255, g: 220, b: 100 }; // fallback
+                return { r: 255, g: 220, b: 100 };
             }
 
             function randomStarColor() {
                 if (Math.random() < whiteStarProbability) {
-                    return { r: 255, g: 255, b: 255 }; // সাদা
+                    return { r: 255, g: 255, b: 255 };
                 } else {
                     return randomNonWhiteColor();
                 }
@@ -348,9 +337,9 @@
 
                     let size;
                     if (Math.random() < 0.3) {
-                        size = 0.15 + Math.random() * 0.35;       // dust
+                        size = 0.15 + Math.random() * 0.35;
                     } else {
-                        size = 0.7 + Math.random() * 1.8;         // mid to big
+                        size = 0.7 + Math.random() * 1.8;
                     }
 
                     const color = randomStarColor();
@@ -444,101 +433,53 @@
                 diskParticles.sort((a, b) => a.radius - b.radius);
             }
 
-            function getAllBlackHoles() {
-                const all = [{ x: mainBH.x, y: mainBH.y, mass: mainBH.mass, radius: mainBH.eventHorizonRadius, isMain: true }];
-                for (const ubh of userBlackHoles) {
-                    if (ubh.alive && ubh.radius > 0.3) {
-                        all.push({ x: ubh.x, y: ubh.y, mass: ubh.mass, radius: ubh.radius, isMain: false, ref: ubh });
-                    }
-                }
-                return all;
-            }
-
-            function applyGravity(star, allBH) {
+            // শুধু মেইন ব্ল্যাক হোলের গ্র্যাভিটি (ইউজার ব্ল্যাক হোল নেই)
+            function applyGravity(star) {
                 if (star.isBackground) return;
-                for (const bh of allBH) {
-                    const dx = bh.x - star.x;
-                    const dy = bh.y - star.y;
-                    const dist = Math.sqrt(dx * dx + dy * dy);
-                    const influenceRadius = bh.radius * 8;
-                    if (dist > influenceRadius) continue;
+                const bh = mainBH;
+                const dx = bh.x - star.x;
+                const dy = bh.y - star.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                const influenceRadius = bh.radius * 8;
+                if (dist > influenceRadius) return;
 
-                    const isUserBH = bh.ref && bh.ref.alive;
-                    const forceMultiplier = isUserBH ? 3.5 : 1.0;
-                    const minDist = bh.radius * 1.6;
-                    if (dist < minDist && dist > 0.01) {
-                        const force = bh.mass / (dist * dist + 8) * 0.05 * forceMultiplier;
-                        star.vx += (dx / dist) * force;
-                        star.vy += (dy / dist) * force;
-                    } else if (dist > minDist && dist < bh.radius * 16) {
-                        const force = bh.mass / (dist * dist) * 0.03 * forceMultiplier;
-                        star.vx += (dx / dist) * force;
-                        star.vy += (dy / dist) * force;
-                    }
+                const minDist = bh.radius * 1.6;
+                if (dist < minDist && dist > 0.01) {
+                    const force = bh.mass / (dist * dist + 8) * 0.05;
+                    star.vx += (dx / dist) * force;
+                    star.vy += (dy / dist) * force;
+                } else if (dist > minDist && dist < bh.radius * 16) {
+                    const force = bh.mass / (dist * dist) * 0.03;
+                    star.vx += (dx / dist) * force;
+                    star.vy += (dy / dist) * force;
+                }
 
-                    if (dist < bh.radius * 6 && dist > bh.radius * 1.2) {
-                        const radialDirX = dx / dist;
-                        const radialDirY = dy / dist;
-                        const tangentialDirX = -radialDirY;
-                        const tangentialDirY = radialDirX;
-                        const vRadial = star.vx * radialDirX + star.vy * radialDirY;
-                        const vTangential = star.vx * tangentialDirX + star.vy * tangentialDirY;
-                        const vCirc = Math.sqrt(bh.mass * 0.06 / dist);
-                        const minTangential = vCirc * 0.6;
-                        const newTangential = Math.max(Math.abs(vTangential), minTangential) * Math.sign(vTangential || 1);
-                        const maxInfallSpeed = vCirc * 0.5;
-                        const newRadial = Math.max(vRadial, -maxInfallSpeed);
-                        star.vx = radialDirX * newRadial + tangentialDirX * newTangential;
-                        star.vy = radialDirY * newRadial + tangentialDirY * newTangential;
-                    }
+                if (dist < bh.radius * 6 && dist > bh.radius * 1.2) {
+                    const radialDirX = dx / dist;
+                    const radialDirY = dy / dist;
+                    const tangentialDirX = -radialDirY;
+                    const tangentialDirY = radialDirX;
+                    const vRadial = star.vx * radialDirX + star.vy * radialDirY;
+                    const vTangential = star.vx * tangentialDirX + star.vy * tangentialDirY;
+                    const vCirc = Math.sqrt(bh.mass * 0.06 / dist);
+                    const minTangential = vCirc * 0.6;
+                    const newTangential = Math.max(Math.abs(vTangential), minTangential) * Math.sign(vTangential || 1);
+                    const maxInfallSpeed = vCirc * 0.5;
+                    const newRadial = Math.max(vRadial, -maxInfallSpeed);
+                    star.vx = radialDirX * newRadial + tangentialDirX * newTangential;
+                    star.vy = radialDirY * newRadial + tangentialDirY * newTangential;
+                }
 
-                    if (dist < bh.radius * 0.75 && bh.radius > 2) {
-                        if (bh.ref && bh.ref.alive) {
-                            respawnStarFromEdge(star, bh.ref);
-                            bh.ref.particlesConsumed = (bh.ref.particlesConsumed || 0) + 1;
-                        } else {
-                            star.x = Math.random() * w;
-                            star.y = Math.random() * h;
-                            star.vx = (Math.random() - 0.5) * 0.4;
-                            star.vy = (Math.random() - 0.5) * 0.4;
-                        }
-                    }
+                // ব্ল্যাক হোল গ্রাস করলে পুনরায় স্ক্রিনে ছড়িয়ে দাও
+                if (dist < bh.radius * 0.75 && bh.radius > 2) {
+                    star.x = Math.random() * w;
+                    star.y = Math.random() * h;
+                    star.vx = (Math.random() - 0.5) * 0.4;
+                    star.vy = (Math.random() - 0.5) * 0.4;
                 }
             }
 
-            function respawnStarFromEdge(star, userBH) {
-                const bhx = userBH.x;
-                const bhy = userBH.y;
-                const edge = Math.floor(Math.random() * 4);
-                let nx, ny;
-                const margin = 15;
-                if (edge === 0) { nx = margin; ny = Math.random() * h; }
-                else if (edge === 1) { nx = w - margin; ny = Math.random() * h; }
-                else if (edge === 2) { nx = Math.random() * w; ny = margin; }
-                else { nx = Math.random() * w; ny = h - margin; }
-                star.x = nx;
-                star.y = ny;
-                const dx = bhx - nx;
-                const dy = bhy - ny;
-                const dist = Math.sqrt(dx*dx + dy*dy);
-                if (dist < 1) return;
-                const radialDirX = dx / dist;
-                const radialDirY = dy / dist;
-                const tangentialDirX = -radialDirY;
-                const tangentialDirY = radialDirX;
-                const orbitSpeed = 2.5 + Math.random() * 1.8;
-                const radialPull = 0.6 + Math.random() * 0.9;
-                star.vx = radialDirX * radialPull + tangentialDirX * orbitSpeed;
-                star.vy = radialDirY * radialPull + tangentialDirY * orbitSpeed;
-                const speedLimit = 4.5;
-                const currentSpeed = Math.sqrt(star.vx*star.vx + star.vy*star.vy);
-                if (currentSpeed > speedLimit) {
-                    const scale = speedLimit / currentSpeed;
-                    star.vx *= scale;
-                    star.vy *= scale;
-                }
-            }
-
+            // মাউস/টাচ রিপেল – ব্ল্যাক হোলের একদম কাছের তারা (ফোটন রিং) বাদে সব তারা ছিটকে যাবে
             function applyMouseRepulsion(star) {
                 if (mouse.x < -500 || mouse.y < -500) return;
                 const dxBH = star.x - mainBH.x;
@@ -564,10 +505,9 @@
             }
 
             function updateStars() {
-                const allBH = getAllBlackHoles();
                 for (const star of stars) {
-                    applyGravity(star, allBH);
-                    applyMouseRepulsion(star);
+                    applyGravity(star);
+                    applyMouseRepulsion(star);   // তাৎক্ষণিক, কোনো হোল্ড/ডিলে নেই
                     if (!star.isBackground) {
                         star.vx *= 0.999;
                         star.vy *= 0.999;
@@ -591,38 +531,6 @@
                 for (const p of diskParticles) {
                     p.angle += p.speed;
                     if (p.angle > Math.PI * 2) p.angle -= Math.PI * 2;
-                }
-            }
-
-            function updateUserBlackHoles() {
-                for (let i = userBlackHoles.length - 1; i >= 0; i--) {
-                    const ubh = userBlackHoles[i];
-                    if (!ubh.alive) {
-                        userBlackHoles.splice(i, 1);
-                        continue;
-                    }
-                    if (ubh.growing) {
-                        ubh.radius += (ubh.targetRadius - ubh.radius) * 0.1;
-                        ubh.mass = ubh.radius * 90;
-                        if (ubh.radius > ubh.targetRadius - 0.2) {
-                            ubh.radius = ubh.targetRadius;
-                            ubh.growing = false;
-                        }
-                    }
-                    if (!ubh.growing && ubh.fading && ubh.radius > 0.2) {
-                        ubh.radius *= 0.982;
-                        ubh.mass = ubh.radius * 90;
-                        ubh.alpha *= 0.982;
-                        if (ubh.radius < 0.4) ubh.alive = false;
-                    }
-                    if (!ubh.growing && !ubh.fading && ubh.holdReleased) {
-                        ubh.fading = true;
-                        ubh.holdReleased = false;
-                    }
-                    if (!ubh.growing && !ubh.fading && !ubh.fromHold) {
-                        ubh.lifetime -= 0.016;
-                        if (ubh.lifetime <= 0) ubh.fading = true;
-                    }
                 }
             }
 
@@ -774,49 +682,6 @@
                 return `rgb(${Math.floor(fr*220)},${Math.floor(fg*190)},${Math.floor(fb*210)})`;
             }
 
-            function renderUserBlackHoles() {
-                for (const ubh of userBlackHoles) {
-                    if (!ubh.alive || ubh.radius < 0.3) continue;
-                    const cx = ubh.x, cy = ubh.y, r = ubh.radius, alpha = ubh.alpha;
-                    const haloGrad = ctx.createRadialGradient(cx, cy, r * 0.4, cx, cy, r * 3);
-                    haloGrad.addColorStop(0, `rgba(30,40,70,${0.05*alpha})`);
-                    haloGrad.addColorStop(0.5, `rgba(50,80,150,${0.03*alpha})`);
-                    haloGrad.addColorStop(1, 'rgba(0,0,0,0)');
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, r * 3, 0, Math.PI * 2);
-                    ctx.fillStyle = haloGrad;
-                    ctx.fill();
-                    ctx.save();
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, r * 1.15, 0, Math.PI * 2);
-                    ctx.strokeStyle = `rgba(200,220,255,${0.65*alpha})`;
-                    ctx.lineWidth = Math.max(0.8, r * 0.05);
-                    ctx.shadowColor = `rgba(140,180,220,${0.5*alpha})`;
-                    ctx.shadowBlur = r * 0.25;
-                    ctx.stroke();
-                    ctx.restore();
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, r, 0, Math.PI * 2);
-                    ctx.fillStyle = `rgba(0,0,0,${1*alpha})`;
-                    ctx.fill();
-                    if (ubh.particlesConsumed > 0 && ubh.radius > 4) {
-                        const sparkCount = Math.floor(ubh.particlesConsumed);
-                        for (let s = 0; s < Math.min(sparkCount, 10); s++) {
-                            const sa = Math.random() * Math.PI * 2;
-                            const sr = r * (1.05 + Math.random() * 1.2);
-                            const sx = cx + Math.cos(sa) * sr;
-                            const sy = cy + Math.sin(sa) * sr;
-                            ctx.fillStyle = `rgba(255,255,255,${0.4*alpha*Math.random()})`;
-                            ctx.beginPath();
-                            ctx.arc(sx, sy, Math.random() * 1.5 + 0.3, 0, Math.PI * 2);
-                            ctx.fill();
-                        }
-                        ubh.particlesConsumed *= 0.88;
-                        if (ubh.particlesConsumed < 0.05) ubh.particlesConsumed = 0;
-                    }
-                }
-            }
-
             function renderStars() {
                 for (const star of stars) {
                     const twinkle = 0.5 + 0.5 * Math.sin(Date.now() * star.twinkleSpeed + star.twinkleOffset);
@@ -827,22 +692,6 @@
                     ctx.beginPath();
                     ctx.arc(star.x, star.y, renderSize, 0, Math.PI * 2);
                     ctx.fill();
-                }
-            }
-
-            function renderGrowingIndicator() {
-                if (mouse.holding && mouse.activeGrowingBH && mouse.activeGrowingBH.growing) {
-                    const ubh = mouse.activeGrowingBH;
-                    const cx = ubh.x, cy = ubh.y, r = ubh.radius;
-                    const pulse = 0.5 + 0.5 * Math.sin(Date.now() * 0.012);
-                    ctx.beginPath();
-                    ctx.arc(cx, cy, r + 5 + pulse * 4, 0, Math.PI * 2);
-                    ctx.strokeStyle = `rgba(255,255,255,${0.45*pulse})`;
-                    ctx.lineWidth = 1.5;
-                    ctx.setLineDash([6, 5]);
-                    ctx.lineDashOffset = Date.now() * 0.04;
-                    ctx.stroke();
-                    ctx.setLineDash([]);
                 }
             }
 
@@ -858,8 +707,6 @@
                 drawPlanetsAndNebulae();
                 renderStars();
                 renderMainBlackHole();
-                renderUserBlackHoles();
-                renderGrowingIndicator();
 
                 const vignetteGrad = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.6, w / 2, h / 2, Math.max(w, h) * 0.8);
                 vignetteGrad.addColorStop(0, 'rgba(0,0,0,0)');
@@ -871,31 +718,11 @@
             function animate() {
                 updateStars();
                 updateDiskParticles();
-                updateUserBlackHoles();
                 render();
                 requestAnimationFrame(animate);
             }
 
-            function createUserBlackHole(x, y, fromHold = false) {
-                if (userBlackHoles.length >= 5) userBlackHoles[0].alive = false;
-                const ubh = {
-                    x, y,
-                    radius: 1.5,
-                    targetRadius: fromHold ? (6 + Math.random() * 14) : (4 + Math.random() * 8),
-                    mass: 100,
-                    alpha: 1,
-                    growing: true,
-                    fading: false,
-                    alive: true,
-                    fromHold,
-                    holdReleased: false,
-                    lifetime: 3 + Math.random() * 3.5,
-                    particlesConsumed: 0,
-                };
-                userBlackHoles.push(ubh);
-                return ubh;
-            }
-
+            // মাউস/টাচ ইভেন্ট – শুধু position আপডেট, কোনো হোল্ড নেই
             function getEventPos(e) {
                 if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
                 if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
@@ -908,96 +735,23 @@
                 return target.closest('.class-card') || target.closest('.install-btn') || target.closest('a') || target.closest('button');
             }
 
-            function onDown(e) {
-                if (isInteractiveTarget(e)) return;
-                const pos = getEventPos(e);
-                mouse.down = true;
-                mouse.holdStartTime = Date.now();
-                mouse.holdX = pos.x;
-                mouse.holdY = pos.y;
-                mouse.holding = false;
-                mouse.activeGrowingBH = null;
-                mouse.isTouch = e.type === 'touchstart';
-                if (mouse.isTouch) e.preventDefault();
-            }
-
             function onMove(e) {
-                const pos = getEventPos(e);
-                mouse.x = pos.x;
-                mouse.y = pos.y;
-                if (mouse.down && mouse.activeGrowingBH && mouse.activeGrowingBH.growing) {
-                    mouse.activeGrowingBH.x = pos.x;
-                    mouse.activeGrowingBH.y = pos.y;
-                    mouse.holdX = pos.x;
-                    mouse.holdY = pos.y;
-                }
-                if (mouse.down && !mouse.holding && mouse.activeGrowingBH === null) {
-                    const dx = pos.x - mouse.holdX;
-                    const dy = pos.y - mouse.holdY;
-                    if (Math.sqrt(dx * dx + dy * dy) > 22) mouse.holdStartTime = 0;
-                }
-                if (mouse.isTouch && e.type === 'touchmove') e.preventDefault();
-            }
-
-            function onUp(e) {
-                const pos = getEventPos(e);
-                mouse.x = pos.x;
-                mouse.y = pos.y;
-                if (mouse.activeGrowingBH) {
-                    mouse.activeGrowingBH.growing = false;
-                    mouse.activeGrowingBH.holdReleased = true;
-                    mouse.activeGrowingBH.targetRadius = mouse.activeGrowingBH.radius;
-                    mouse.activeGrowingBH = null;
-                }
-                mouse.down = false;
-                mouse.holding = false;
-                mouse.holdStartTime = 0;
-            }
-
-            function onClick(e) {
                 if (isInteractiveTarget(e)) return;
-                if (mouse.isTouch) return;
                 const pos = getEventPos(e);
-                const now = Date.now();
-                const dx = pos.x - mouse.lastClickX;
-                const dy = pos.y - mouse.lastClickY;
-                const dist = Math.sqrt(dx * dx + dy * dy);
-                const timeDiff = now - mouse.lastClickTime;
-                if (timeDiff < 380 && dist < 35 && mouse.lastClickTime > 0) {
-                    const ubh = createUserBlackHole(pos.x, pos.y, false);
-                    ubh.targetRadius = 5 + Math.random() * 10;
-                    mouse.lastClickTime = 0;
-                    return;
-                }
-                mouse.lastClickTime = now;
-                mouse.lastClickX = pos.x;
-                mouse.lastClickY = pos.y;
+                mouse.x = pos.x;
+                mouse.y = pos.y;
             }
 
-            function checkHold() {
-                if (mouse.down && !mouse.holding && mouse.holdStartTime > 0) {
-                    const elapsed = Date.now() - mouse.holdStartTime;
-                    if (elapsed > 350 && !isInteractiveTarget({ target: document.elementFromPoint(mouse.holdX, mouse.holdY) })) {
-                        mouse.holding = true;
-                        const ubh = createUserBlackHole(mouse.holdX, mouse.holdY, true);
-                        ubh.targetRadius = 8 + Math.random() * 16;
-                        mouse.activeGrowingBH = ubh;
-                    }
-                }
-                if (mouse.holding && mouse.activeGrowingBH && mouse.activeGrowingBH.growing) {
-                    const ubh = mouse.activeGrowingBH;
-                    ubh.targetRadius = Math.min(ubh.targetRadius + 0.12, 28);
-                }
+            function onLeave() {
+                mouse.x = -9999;
+                mouse.y = -9999;
             }
 
             document.addEventListener('mousemove', onMove, { passive: true });
-            document.addEventListener('mousedown', onDown);
-            document.addEventListener('mouseup', onUp);
-            document.addEventListener('click', onClick);
-            document.addEventListener('touchstart', onDown, { passive: false });
+            document.addEventListener('mouseleave', onLeave);
             document.addEventListener('touchmove', onMove, { passive: false });
-            document.addEventListener('touchend', onUp);
-            document.addEventListener('touchcancel', onUp);
+            document.addEventListener('touchend', onLeave);
+            document.addEventListener('touchcancel', onLeave);
             document.addEventListener('contextmenu', (e) => {
                 if (!isInteractiveTarget(e)) e.preventDefault();
             });
@@ -1005,7 +759,6 @@
             resize();
             window.addEventListener('resize', resize);
             window.addEventListener('orientationchange', () => setTimeout(resize, 200));
-            setInterval(checkHold, 50);
             animate();
         })();
     </script>
