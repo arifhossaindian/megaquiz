@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Loading quiz...</title>
+  <style>
+    body { font-family: Arial; text-align: center; padding-top: 80px; }
+  </style>
+  <script>
+    (function() {
+      var path = window.location.pathname;  // যেমন /class6
+      // শুধু তখনই কাজ করবে যখন পাথ খালি নয় আর .html শেষ নয়
+      if (path && !path.endsWith('.html') && path !== '/') {
+        // শেষ স্ল্যাশ থাকলে সরিয়ে দাও
+        if (path.endsWith('/')) {
+          path = path.slice(0, -1);
+        }
+        var fetchURL = path + '.html';  // class6.html আনবে
+        fetch(fetchURL)
+          .then(function(response) {
+            if (response.ok) {
+              return response.text();
+            }
+            throw new Error('Not found');
+          })
+          .then(function(html) {
+            // পুরো পেজের কন্টেন্ট রিপ্লেস করো
+            document.open();
+            document.write(html);
+            document.close();
+            // URL টা ক্লিন রাখো (পুরনো /class6, ওটাতে .html যোগ না করে)
+            window.history.replaceState({}, '', path);
+          })
+          .catch(function() {
+            // যদি .html ফাইল না থাকে, তাহলে নিচের মেসেজ দেখাবে
+            document.body.innerHTML = '<h2>404 - Page Not Found</h2><p>Sorry, the quiz you are looking for does not exist.</p>';
+          });
+      } else {
+        // যদি সরাসরি / বা .html দেওয়া হয়, তাহলে কিছু করবে না (বা 404 দেখাবে)
+        document.body.innerHTML = '<h2>404 - Page Not Found</h2>';
+      }
+    })();
+  </script>
+</head>
+<body>
+  <p>Loading...</p>
+</body>
+</html>
