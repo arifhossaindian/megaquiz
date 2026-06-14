@@ -43,49 +43,54 @@
             text-align: center;
             color: #fff;
             width: 90%;
-            max-width: 600px;
+            max-width: 650px;
             pointer-events: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            margin-top: 12vh;
+            margin-top: clamp(35px, 10vh, 12vh);
+            padding: 0 clamp(4px, 1vw, 16px);
         }
+
         h1 {
-            font-size: 2.2rem;
+            font-size: clamp(1.3rem, 3.5vw, 2.4rem);
             font-weight: 800;
             text-shadow: 0 0 30px rgba(255, 255, 255, 0.5), 0 0 60px rgba(180, 200, 255, 0.35);
             margin-bottom: 2px;
             letter-spacing: 1px;
             pointer-events: none;
+            line-height: 1.2;
         }
         .by-line {
-            font-size: 0.9rem;
+            font-size: clamp(0.65rem, 1.4vw, 0.95rem);
             font-weight: 600;
-            margin-bottom: 34px;
+            margin-bottom: clamp(20px, 4vw, 34px);
             opacity: 0.75;
             color: #ccc;
             letter-spacing: 0.5px;
             pointer-events: none;
         }
+
         .class-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(115px, 1fr));
-            gap: 18px;
+            grid-template-columns: repeat(auto-fit, minmax(clamp(88px, 17vw, 125px), 1fr));
+            gap: clamp(9px, 1.8vw, 18px);
             justify-content: center;
             width: 100%;
-            margin-bottom: 18px;
+            margin-bottom: clamp(10px, 2vw, 18px);
         }
+
         .class-card {
             background: transparent;
             backdrop-filter: none;
             -webkit-backdrop-filter: none;
             border: none;
             border-radius: 0;
-            padding: 8px 4px;
+            padding: clamp(6px, 1.3vw, 10px) clamp(2px, 0.6vw, 6px);
             color: #fff;
             text-decoration: none;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: clamp(0.68rem, 1.5vw, 0.98rem);
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
@@ -93,6 +98,10 @@
             text-shadow: 0 0 10px rgba(255, 255, 255, 0.6);
             letter-spacing: 0.5px;
             position: relative;
+            min-height: clamp(32px, 6vw, 42px);
+            white-space: nowrap;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
         }
         .class-card::before {
             display: none;
@@ -105,53 +114,239 @@
             border: none;
             box-shadow: none;
         }
-        @media (max-width: 480px) {
-            h1 {
-                font-size: 1.6rem;
-            }
+        .class-card:active {
+            transform: translateY(-2px) scale(0.96);
+            transition: all 0.12s ease;
+        }
+
+        /* ── Extra-small screens: ensure 2 columns max for very narrow devices ── */
+        @media (max-width: 350px) {
             .class-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 14px;
+                gap: 8px;
             }
             .class-card {
-                font-size: 0.8rem;
-                padding: 6px 2px;
+                font-size: 0.62rem;
+                padding: 5px 2px;
+                min-height: 28px;
+                letter-spacing: 0.1px;
+            }
+            h1 {
+                font-size: 1.1rem;
+                letter-spacing: 0.4px;
+            }
+            .by-line {
+                font-size: 0.58rem;
+                margin-bottom: 14px;
+            }
+            .container {
+                margin-top: 22px;
             }
         }
+
+        /* ── Wider phones (375-480px): allow natural auto-fit (usually 3 columns) ── */
+        @media (min-width: 351px) and (max-width: 480px) {
+            .class-grid {
+                gap: clamp(8px, 2.2vw, 14px);
+            }
+            .class-card {
+                font-size: clamp(0.66rem, 1.8vw, 0.78rem);
+                min-height: clamp(30px, 5.5vw, 36px);
+            }
+            h1 {
+                font-size: clamp(1.2rem, 3.8vw, 1.6rem);
+            }
+        }
+
+        /* ── Tablets ── */
+        @media (min-width: 481px) and (max-width: 768px) {
+            .class-grid {
+                gap: clamp(10px, 2vw, 16px);
+            }
+            .class-card {
+                font-size: clamp(0.72rem, 1.4vw, 0.88rem);
+            }
+        }
+
         .install-btn {
-            margin-top: 4px;
+            margin-top: clamp(2px, 0.6vw, 6px);
             background: linear-gradient(135deg, #1e3a8a, #2563eb);
             border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 11px 28px;
+            padding: clamp(9px, 1.6vw, 12px) clamp(20px, 3.5vw, 30px);
             color: #fff;
             border-radius: 50px;
             font-weight: 700;
             cursor: pointer;
-            font-size: 1rem;
+            font-size: clamp(0.8rem, 1.5vw, 1.05rem);
             display: none;
             letter-spacing: 0.4px;
             transition: all 0.3s;
             box-shadow: 0 6px 20px rgba(30, 58, 138, 0.5);
+            -webkit-tap-highlight-color: transparent;
         }
         .install-btn:hover {
             background: linear-gradient(135deg, #2563eb, #3b82f6);
             box-shadow: 0 8px 28px rgba(37, 99, 235, 0.6);
             transform: translateY(-2px);
         }
+        .install-btn:active {
+            transform: translateY(0px) scale(0.96);
+            transition: all 0.12s ease;
+        }
+
+        /* ========== Enhanced Footer Styles ========== */
         .footer-fixed {
             position: fixed;
-            bottom: 12px;
+            bottom: clamp(3px, 1.2vh, 14px);
             left: 0;
             width: 100%;
             text-align: center;
             z-index: 2;
             pointer-events: auto;
-            font-size: 0.7rem;
+            font-size: clamp(0.5rem, 1.1vw, 0.72rem);
             color: #ccc;
-            text-shadow: 0 0 8px rgba(255,255,255,0.3);
-            opacity: 0.8;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+            opacity: 0.85;
             letter-spacing: 0.3px;
-            line-height: 1.4;
+            line-height: 1.6;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: center;
+            gap: 1px;
+            padding: 0 clamp(4px, 1.5vw, 12px);
+            pointer-events: auto;
+        }
+        .footer-item {
+            display: inline-flex;
+            align-items: center;
+            gap: clamp(2px, 0.5vw, 5px);
+            color: #ddd;
+            text-decoration: none;
+            font-weight: 500;
+            padding: clamp(2px, 0.5vw, 5px) clamp(4px, 0.8vw, 8px);
+            border-radius: 20px;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1.2);
+            white-space: nowrap;
+            cursor: pointer;
+            position: relative;
+            text-shadow: 0 0 6px rgba(255, 255, 255, 0.25);
+            letter-spacing: 0.2px;
+        }
+        .footer-item svg {
+            flex-shrink: 0;
+            width: clamp(13px, 2.2vw, 18px);
+            height: clamp(13px, 2.2vw, 18px);
+            transition: all 0.3s ease;
+            filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.2));
+        }
+        .footer-item:hover {
+            color: #fff;
+            text-shadow: 0 0 16px rgba(255, 255, 255, 0.85), 0 0 32px rgba(180, 210, 255, 0.7), 0 0 48px rgba(150, 180, 255, 0.4);
+            transform: translateY(-3px);
+            background: rgba(255, 255, 255, 0.06);
+            box-shadow: 0 0 20px rgba(180, 200, 255, 0.2);
+        }
+        .footer-item:hover svg {
+            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.8)) drop-shadow(0 0 14px rgba(180, 210, 255, 0.6));
+            transform: scale(1.1);
+        }
+        .footer-item:active {
+            transform: translateY(-1px) scale(0.94);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.95), 0 0 38px rgba(200, 220, 255, 0.8);
+            transition: all 0.12s ease;
+        }
+        .footer-sep {
+            display: inline-block;
+            margin: 0 clamp(1px, 0.4vw, 6px);
+            opacity: 0.45;
+            color: #999;
+            pointer-events: none;
+            font-weight: 300;
+            user-select: none;
+            -webkit-user-select: none;
+            font-size: clamp(0.45rem, 0.9vw, 0.78rem);
+            line-height: 1;
+        }
+        .footer-item .upi-detail {
+            letter-spacing: 0.1px;
+        }
+        /* Instagram special accent on hover */
+        .footer-item.ig-item:hover {
+            text-shadow: 0 0 16px rgba(255, 150, 180, 0.9), 0 0 32px rgba(255, 100, 150, 0.6), 0 0 48px rgba(255, 80, 130, 0.35);
+            box-shadow: 0 0 22px rgba(255, 130, 170, 0.25);
+        }
+        .footer-item.ig-item:hover svg {
+            filter: drop-shadow(0 0 8px rgba(255, 140, 170, 0.9)) drop-shadow(0 0 14px rgba(255, 100, 150, 0.6));
+        }
+        /* Telegram special accent on hover */
+        .footer-item.tg-item:hover {
+            text-shadow: 0 0 16px rgba(140, 200, 255, 0.9), 0 0 32px rgba(100, 180, 255, 0.6), 0 0 48px rgba(80, 160, 255, 0.35);
+            box-shadow: 0 0 22px rgba(120, 190, 255, 0.25);
+        }
+        .footer-item.tg-item:hover svg {
+            filter: drop-shadow(0 0 8px rgba(130, 200, 255, 0.9)) drop-shadow(0 0 14px rgba(100, 180, 255, 0.6));
+        }
+        /* Email special accent on hover */
+        .footer-item.email-item:hover {
+            text-shadow: 0 0 16px rgba(255, 220, 140, 0.9), 0 0 32px rgba(255, 200, 100, 0.6), 0 0 48px rgba(255, 180, 80, 0.35);
+            box-shadow: 0 0 22px rgba(255, 210, 130, 0.25);
+        }
+        .footer-item.email-item:hover svg {
+            filter: drop-shadow(0 0 8px rgba(255, 210, 130, 0.9)) drop-shadow(0 0 14px rgba(255, 190, 100, 0.6));
+        }
+        /* Support/UPI special accent on hover */
+        .footer-item.upi-item:hover {
+            text-shadow: 0 0 16px rgba(160, 255, 180, 0.9), 0 0 32px rgba(120, 240, 150, 0.6), 0 0 48px rgba(100, 220, 130, 0.35);
+            box-shadow: 0 0 22px rgba(140, 240, 170, 0.25);
+        }
+        .footer-item.upi-item:hover svg {
+            filter: drop-shadow(0 0 8px rgba(150, 250, 170, 0.9)) drop-shadow(0 0 14px rgba(120, 230, 150, 0.6));
+        }
+
+        /* ── Extra-small footer ── */
+        @media (max-width: 380px) {
+            .footer-fixed {
+                font-size: 0.48rem;
+                bottom: 2px;
+                padding: 0 2px;
+                gap: 0px;
+                line-height: 1.4;
+            }
+            .footer-item {
+                padding: 1px 3px;
+                gap: 1px;
+                letter-spacing: 0px;
+            }
+            .footer-item svg {
+                width: 12px;
+                height: 12px;
+            }
+            .footer-sep {
+                margin: 0 1px;
+                font-size: 0.45rem;
+            }
+        }
+        @media (min-width: 381px) and (max-width: 520px) {
+            .footer-fixed {
+                font-size: 0.55rem;
+                bottom: 4px;
+                padding: 0 4px;
+                gap: 0px;
+                line-height: 1.45;
+            }
+            .footer-item {
+                padding: 2px 4px;
+                gap: 2px;
+            }
+            .footer-item svg {
+                width: 14px;
+                height: 14px;
+            }
+            .footer-sep {
+                margin: 0 2px;
+                font-size: 0.52rem;
+            }
         }
     </style>
 </head>
@@ -162,20 +357,45 @@
         <h1>Dipayan Pathsala</h1>
         <p class="by-line">Mega Quiz by Arif Hussain</p>
         <div class="class-grid">
-            <a href="class5" class="class-card">🎒 Class 5</a>
-            <a href="class6" class="class-card">📘 Class 6</a>
-            <a href="class7" class="class-card">📗 Class 7</a>
-            <a href="class8" class="class-card">📙 Class 8</a>
-            <a href="class9" class="class-card">📕 Class 9</a>
-            <a href="class10" class="class-card">📓 Class 10</a>
-            <a href="competitive" class="class-card">🏆 Competitive</a>
+            <a href="class5.html" class="class-card">🎒 Class 5</a>
+            <a href="class6.html" class="class-card">📘 Class 6</a>
+            <a href="class7.html" class="class-card">📗 Class 7</a>
+            <a href="class8.html" class="class-card">📙 Class 8</a>
+            <a href="class9.html" class="class-card">📕 Class 9</a>
+            <a href="class10.html" class="class-card">📓 Class 10</a>
+            <a href="class11arts.html" class="class-card">📖 Class 11(Arts)</a>
+            <a href="class11science.html" class="class-card">🧪 Class 11(Sc.)</a>
+            <a href="class12arts.html" class="class-card">📒 Class 12(Arts)</a>
+            <a href="class12science.html" class="class-card">🔬 Class 12(Sc.)</a>
+            <a href="competitive.html" class="class-card">🏆 Competitive</a>
         </div>
         <button class="install-btn" id="installButton" style="display:none;">📲 অ্যাপ হিসেবে ইনস্টল করো</button>
     </div>
 
+    <!-- ========== Enhanced Footer / Contact Section ========== -->
     <div class="footer-fixed">
-        📧 arifbeldanga@gmail.com &nbsp;|&nbsp; 💬 Telegram: @beldanga1
-    </div>
+        <!-- Email -->
+        <a href="mailto:arifbeldanga@gmail.com" class="footer-item email-item" title="ইমেইল করুন" rel="noopener">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="4" width="20" height="16" rx="2" ry="2"/>
+                <polyline points="22,4 12,13.5 2,4"/>
+            </svg>
+            arifbeldanga@gmail.com
+        </a>
+
+        <span class="footer-sep">|</span>
+
+        <!-- Telegram -->
+        <a href="https://t.me/beldanga1" target="_blank" class="footer-item tg-item" title="টেলিগ্রামে যুক্ত হন" rel="noopener noreferrer">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 0C5.373 0 0 5.373 0 12s5.373 12 12 12 12-5.373 12-12S18.627 0 12 0zm5.894 8.221l-1.97 9.28c-.145.658-.537.818-1.084.508l-3-2.21-1.446 1.394c-.14.18-.357.295-.6.295-.002 0-.003 0-.005 0l.213-3.054 5.56-5.022c.24-.213-.054-.334-.373-.121l-6.87 4.326-2.96-.924c-.64-.203-.658-.64.135-.954l11.566-4.458c.538-.196 1.006.128.832.938z"/>
+            </svg>
+            @beldanga1
+        </a>
+
+        <span class="footer-sep">|</span>
+
+        </div>
 
     <script>
         let deferredPrompt;
@@ -211,15 +431,14 @@
             const DISK_PARTICLE_COUNT = 180;
             const DISK_VIEW_ANGLE = Math.PI / 3.2;
 
-            // mouse state simplified – only repel, no hold/create
             const mouse = {
-                x: -9999, y: -9999
+                x: -9999,
+                y: -9999
             };
 
             let planets = [];
             let nebulae = [];
 
-            // সাদা তারার অনুপাত প্রতিবার ৭৫% থেকে ৮৫% এর মধ্যে র্যান্ডম হবে
             const whiteStarProbability = 0.75 + Math.random() * 0.10;
 
             const nonWhitePalette = [
@@ -252,16 +471,20 @@
             function initPlanetsAndNebulae() {
                 planets = [
                     {
-                        relX: 0.18, relY: 0.22,
+                        relX: 0.18,
+                        relY: 0.22,
                         radius: 0,
-                        color1: '#d4a373', color2: '#b5835a',
+                        color1: '#d4a373',
+                        color2: '#b5835a',
                         ringColor: 'rgba(210,180,140,0.7)',
                         ringWidth: 0
                     },
                     {
-                        relX: 0.82, relY: 0.68,
+                        relX: 0.82,
+                        relY: 0.68,
                         radius: 0,
-                        color1: '#6d8aa3', color2: '#4a6274',
+                        color1: '#6d8aa3',
+                        color2: '#4a6274',
                         ringColor: null,
                         ringWidth: 0
                     }
@@ -323,7 +546,6 @@
                 const clusterRadius = Math.min(w, h) * 0.6;
                 const minDist = bh.eventHorizonRadius * 1.5;
 
-                // ---------- ১. অরবিটাল তারা ----------
                 for (let i = 0; i < ORBITAL_STAR_COUNT; i++) {
                     const angle = Math.random() * Math.PI * 2;
                     const dist = minDist + Math.pow(Math.random(), 0.2) * (clusterRadius - minDist);
@@ -344,7 +566,10 @@
 
                     const color = randomStarColor();
                     stars.push({
-                        x, y, vx, vy,
+                        x,
+                        y,
+                        vx,
+                        vy,
                         size,
                         color,
                         brightness: Math.random(),
@@ -355,15 +580,16 @@
                     });
                 }
 
-                // ---------- ২. ব্যাকগ্রাউন্ড তারা ----------
                 for (let i = 0; i < BACKGROUND_STAR_COUNT; i++) {
                     const x = Math.random() * w;
                     const y = Math.random() * h;
                     const size = (Math.random() < 0.6) ? (0.1 + Math.random() * 0.4) : (0.5 + Math.random() * 1.2);
                     const color = randomStarColor();
                     stars.push({
-                        x, y,
-                        vx: 0, vy: 0,
+                        x,
+                        y,
+                        vx: 0,
+                        vy: 0,
                         size,
                         color,
                         brightness: Math.random(),
@@ -374,10 +600,11 @@
                     });
                 }
 
-                // ---------- ৩. কোণার তারা ----------
                 const cornerOffsets = [
-                    { cx: 30, cy: 30 }, { cx: w - 30, cy: 30 },
-                    { cx: 30, cy: h - 30 }, { cx: w - 30, cy: h - 30 }
+                    { cx: 30, cy: 30 },
+                    { cx: w - 30, cy: 30 },
+                    { cx: 30, cy: h - 30 },
+                    { cx: w - 30, cy: h - 30 }
                 ];
                 for (const corner of cornerOffsets) {
                     for (let i = 0; i < CORNER_STARS_COUNT / 4; i++) {
@@ -386,8 +613,10 @@
                         const size = 0.8 + Math.random() * 1.8;
                         const color = randomStarColor();
                         stars.push({
-                            x, y,
-                            vx: 0, vy: 0,
+                            x,
+                            y,
+                            vx: 0,
+                            vy: 0,
                             size,
                             color,
                             brightness: 0.6 + Math.random() * 0.4,
@@ -399,9 +628,8 @@
                     }
                 }
 
-                // বড় তারা (2x) শুধু অরবিটালদের মধ্য থেকে
                 const orbitalStars = stars.filter(s => !s.isBackground);
-                const indices = Array.from({length: orbitalStars.length}, (_, i) => i);
+                const indices = Array.from({ length: orbitalStars.length }, (_, i) => i);
                 for (let i = indices.length - 1; i > 0; i--) {
                     const j = Math.floor(Math.random() * (i + 1));
                     [indices[i], indices[j]] = [indices[j], indices[i]];
@@ -424,7 +652,9 @@
                     const baseSpeed = 0.022 / Math.sqrt((radius - bh.eventHorizonRadius * 0.7) / bh.eventHorizonRadius + 0.35);
                     const speed = baseSpeed * (0.8 + Math.random() * 0.35);
                     diskParticles.push({
-                        radius, angle, speed,
+                        radius,
+                        angle,
+                        speed,
                         size: Math.random() * 1.2 + 0.3,
                         brightness: 0.45 + Math.random() * 0.4,
                         colorShift: Math.random(),
@@ -433,7 +663,6 @@
                 diskParticles.sort((a, b) => a.radius - b.radius);
             }
 
-            // শুধু মেইন ব্ল্যাক হোলের গ্র্যাভিটি (ইউজার ব্ল্যাক হোল নেই)
             function applyGravity(star) {
                 if (star.isBackground) return;
                 const bh = mainBH;
@@ -470,7 +699,6 @@
                     star.vy = radialDirY * newRadial + tangentialDirY * newTangential;
                 }
 
-                // ব্ল্যাক হোল গ্রাস করলে পুনরায় স্ক্রিনে ছড়িয়ে দাও
                 if (dist < bh.radius * 0.75 && bh.radius > 2) {
                     star.x = Math.random() * w;
                     star.y = Math.random() * h;
@@ -479,7 +707,6 @@
                 }
             }
 
-            // মাউস/টাচ রিপেল – ব্ল্যাক হোলের একদম কাছের তারা (ফোটন রিং) বাদে সব তারা ছিটকে যাবে
             function applyMouseRepulsion(star) {
                 if (mouse.x < -500 || mouse.y < -500) return;
                 const dxBH = star.x - mainBH.x;
@@ -507,7 +734,7 @@
             function updateStars() {
                 for (const star of stars) {
                     applyGravity(star);
-                    applyMouseRepulsion(star);   // তাৎক্ষণিক, কোনো হোল্ড/ডিলে নেই
+                    applyMouseRepulsion(star);
                     if (!star.isBackground) {
                         star.vx *= 0.999;
                         star.vy *= 0.999;
@@ -545,7 +772,8 @@
                     ctx.fill();
                 }
                 for (const p of planets) {
-                    const grad = ctx.createRadialGradient(p.x - p.radius * 0.3, p.y - p.radius * 0.3, p.radius * 0.1, p.x, p.y, p.radius);
+                    const grad = ctx.createRadialGradient(p.x - p.radius * 0.3, p.y - p.radius * 0.3, p.radius * 0.1, p.x, p.y, p
+                        .radius);
                     grad.addColorStop(0, p.color1);
                     grad.addColorStop(1, p.color2);
                     ctx.beginPath();
@@ -572,7 +800,8 @@
 
             function renderMainBlackHole() {
                 const bh = mainBH;
-                const cx = bh.x, cy = bh.y;
+                const cx = bh.x,
+                    cy = bh.y;
                 const rEvent = bh.eventHorizonRadius;
                 const rPhoton = bh.photonRingRadius;
                 const diskTilt = DISK_VIEW_ANGLE;
@@ -600,9 +829,16 @@
                     const behind = diskZ * Math.sin(diskTilt);
                     const distFromCenter = Math.sqrt(diskX * diskX + (diskZ * cosTilt) * (diskZ * cosTilt));
                     const particleData = {
-                        screenX, screenY, behind, distFromCenter,
-                        r, angle, size: p.size, brightness: p.brightness,
-                        colorShift: p.colorShift, speed: p.speed
+                        screenX,
+                        screenY,
+                        behind,
+                        distFromCenter,
+                        r,
+                        angle,
+                        size: p.size,
+                        brightness: p.brightness,
+                        colorShift: p.colorShift,
+                        speed: p.speed
                     };
                     if (behind > 0 && distFromCenter < rEvent * 4.2) {
                         const lensStrength = behind / (distFromCenter + rEvent * 0.5) * rEvent * 2;
@@ -678,8 +914,8 @@
                 const fr = Math.min(1, r * brightness);
                 const fg = Math.min(1, g * brightness);
                 const fb = Math.min(1, b * brightness);
-                if (isFarSide) return `rgb(${Math.floor(fr*200)},${Math.floor(fg*180)},${Math.floor(fb*230)})`;
-                return `rgb(${Math.floor(fr*220)},${Math.floor(fg*190)},${Math.floor(fb*210)})`;
+                if (isFarSide) return `rgb(${Math.floor(fr * 200)},${Math.floor(fg * 180)},${Math.floor(fb * 230)})`;
+                return `rgb(${Math.floor(fr * 220)},${Math.floor(fg * 190)},${Math.floor(fb * 210)})`;
             }
 
             function renderStars() {
@@ -697,7 +933,8 @@
 
             function render() {
                 ctx.clearRect(0, 0, w, h);
-                const bgGrad = ctx.createRadialGradient(mainBH.x, mainBH.y, mainBH.eventHorizonRadius * 0.4, w / 2, h / 2, Math.max(w, h));
+                const bgGrad = ctx.createRadialGradient(mainBH.x, mainBH.y, mainBH.eventHorizonRadius * 0.4, w / 2, h / 2, Math.max(
+                    w, h));
                 bgGrad.addColorStop(0, '#040a18');
                 bgGrad.addColorStop(0.5, '#010308');
                 bgGrad.addColorStop(1, '#000002');
@@ -708,7 +945,8 @@
                 renderStars();
                 renderMainBlackHole();
 
-                const vignetteGrad = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.6, w / 2, h / 2, Math.max(w, h) * 0.8);
+                const vignetteGrad = ctx.createRadialGradient(w / 2, h / 2, Math.min(w, h) * 0.6, w / 2, h / 2, Math.max(w, h) *
+                    0.8);
                 vignetteGrad.addColorStop(0, 'rgba(0,0,0,0)');
                 vignetteGrad.addColorStop(1, 'rgba(0,0,0,0.5)');
                 ctx.fillStyle = vignetteGrad;
@@ -722,17 +960,18 @@
                 requestAnimationFrame(animate);
             }
 
-            // মাউস/টাচ ইভেন্ট – শুধু position আপডেট, কোনো হোল্ড নেই
             function getEventPos(e) {
                 if (e.touches && e.touches.length > 0) return { x: e.touches[0].clientX, y: e.touches[0].clientY };
-                if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[0].clientY };
+                if (e.changedTouches && e.changedTouches.length > 0) return { x: e.changedTouches[0].clientX, y: e.changedTouches[
+                        0].clientY };
                 return { x: e.clientX, y: e.clientY };
             }
 
             function isInteractiveTarget(e) {
                 const target = e.target;
                 if (!target) return false;
-                return target.closest('.class-card') || target.closest('.install-btn') || target.closest('a') || target.closest('button');
+                return target.closest('.class-card') || target.closest('.install-btn') || target.closest('a') || target.closest(
+                    'button');
             }
 
             function onMove(e) {
