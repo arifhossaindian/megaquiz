@@ -271,7 +271,7 @@
         .footer-item .upi-detail {
             letter-spacing: 0.1px;
         }
-        /* Instagram special accent on hover */
+        /* Instagram special accent on hover (now used for heart as base, we'll override for heart) */
         .footer-item.ig-item:hover {
             text-shadow: 0 0 16px rgba(255, 150, 180, 0.9), 0 0 32px rgba(255, 100, 150, 0.6), 0 0 48px rgba(255, 80, 130, 0.35);
             box-shadow: 0 0 22px rgba(255, 130, 170, 0.25);
@@ -295,7 +295,7 @@
         .footer-item.email-item:hover svg {
             filter: drop-shadow(0 0 8px rgba(255, 210, 130, 0.9)) drop-shadow(0 0 14px rgba(255, 190, 100, 0.6));
         }
-        /* Support/UPI special accent on hover */
+        /* Support/UPI special accent on hover (old class, now reused for heart) */
         .footer-item.upi-item:hover {
             text-shadow: 0 0 16px rgba(160, 255, 180, 0.9), 0 0 32px rgba(120, 240, 150, 0.6), 0 0 48px rgba(100, 220, 130, 0.35);
             box-shadow: 0 0 22px rgba(140, 240, 170, 0.25);
@@ -348,6 +348,70 @@
                 font-size: 0.52rem;
             }
         }
+
+        /* ── Heart (Share & Motivate) Styles ── */
+        .heart-item {
+            cursor: pointer;
+            color: #ffaaaa;
+            text-shadow: 0 0 8px rgba(255, 60, 60, 0.6);
+        }
+        .heart-item .heart-svg {
+            /* new heartbeat animation copied from class6.html */
+            animation: heartGlowPulse 1.6s ease-in-out infinite;
+            fill: #ff3333;
+            stroke: #ff3333;
+        }
+        /* New keyframes copied from class6.html */
+        @keyframes heartGlowPulse {
+            0%,
+            100% {
+                filter: drop-shadow(0 0 3px rgba(255, 80, 100, 0.5)) drop-shadow(0 0 6px rgba(255, 60, 90, 0.3));
+                transform: translateY(0) scale(1);
+            }
+            20% {
+                filter: drop-shadow(0 0 8px rgba(255, 50, 70, 0.85)) drop-shadow(0 0 16px rgba(255, 80, 110, 0.5)) drop-shadow(0 0 24px rgba(255, 100, 130, 0.3));
+                transform: translateY(-3px) scale(1.1);
+            }
+            40% {
+                filter: drop-shadow(0 0 3px rgba(255, 80, 100, 0.5)) drop-shadow(0 0 6px rgba(255, 60, 90, 0.3));
+                transform: translateY(0) scale(1);
+            }
+            60% {
+                filter: drop-shadow(0 0 10px rgba(255, 40, 60, 0.95)) drop-shadow(0 0 20px rgba(255, 70, 100, 0.55)) drop-shadow(0 0 30px rgba(255, 90, 120, 0.35));
+                transform: translateY(-4px) scale(1.13);
+            }
+            80% {
+                filter: drop-shadow(0 0 4px rgba(255, 80, 100, 0.55)) drop-shadow(0 0 7px rgba(255, 60, 90, 0.35));
+                transform: translateY(-1px) scale(1.04);
+            }
+        }
+        /* Hover/active glow (faster) */
+        .heart-item:hover .heart-svg,
+        .heart-item:active .heart-svg {
+            animation: heartGlowPulse 0.6s ease-in-out infinite;
+        }
+        .heart-item:hover {
+            background: rgba(255, 80, 80, 0.1);
+            box-shadow: 0 0 18px rgba(255, 100, 100, 0.4);
+            text-shadow: 0 0 16px rgba(255, 60, 60, 0.9), 0 0 32px rgba(255, 100, 80, 0.7);
+        }
+        .heart-item:hover .heart-svg {
+            filter: drop-shadow(0 0 12px rgba(255, 50, 70, 1)) drop-shadow(0 0 24px rgba(255, 80, 110, 0.7)) drop-shadow(0 0 36px rgba(255, 100, 130, 0.45));
+            transform: scale(1.15);
+        }
+
+        /* Burst effect on click/touch */
+        .heart-svg.burst {
+            animation: heartBurst 0.5s ease-in-out !important;
+        }
+        @keyframes heartBurst {
+            0%   { transform: scale(1); filter: drop-shadow(0 0 4px rgba(255,50,50,0.8)); }
+            20%  { transform: scale(1.45); filter: drop-shadow(0 0 24px rgba(255,0,0,1)) drop-shadow(0 0 40px rgba(255,50,50,0.8)); }
+            40%  { transform: scale(0.85); filter: drop-shadow(0 0 12px rgba(255,50,50,0.9)); }
+            60%  { transform: scale(1.3); filter: drop-shadow(0 0 28px rgba(255,0,0,1)) drop-shadow(0 0 48px rgba(255,80,80,0.7)); }
+            80%  { transform: scale(0.92); filter: drop-shadow(0 0 10px rgba(255,50,50,0.8)); }
+            100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(255,50,50,0.7)); }
+        }
     </style>
 </head>
 <body>
@@ -394,16 +458,18 @@
         </a>
 
         <span class="footer-sep">|</span>
-                    <button class="footer-link upi-link" id="shareBtn" title="এই অ্যাপটি শেয়ার করুন" onclick="shareApp()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
-                <span>Share &amp; Motivate</span>
-            </button>
 
-        </div>
+        <!-- Share & Motivate (Clickable Heart with burst effect) -->
+        <span class="footer-item heart-item" id="shareBtn" title="শেয়ার করে উৎসাহিত করুন">
+            <svg width="18" height="18" viewBox="0 0 24 24" class="heart-svg" xmlns="http://www.w3.org/2000/svg">
+                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
+            </svg>
+            Share with friends
+        </span>
+    </div>
 
     <script>
+        // PWA install logic
         let deferredPrompt;
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
@@ -421,6 +487,51 @@
     </script>
 
     <script>
+        // Share function with heart burst animation
+        function shareApp() {
+            // Trigger heart burst
+            const heartSvg = document.querySelector('.heart-svg');
+            if (heartSvg) {
+                heartSvg.classList.add('burst');
+                setTimeout(() => heartSvg.classList.remove('burst'), 500);
+            }
+
+            // Share via Web Share API (mobile/desktop where supported)
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Dipayan Pathsala',
+                    text: '📚 দারুণ এই কুইজ অ্যাপটি দেখো!',
+                    url: window.location.href
+                }).catch(() => {});
+            } else {
+                // Fallback for desktop: copy link
+                const shareUrl = window.location.href;
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(shareUrl).then(() => {
+                        alert('✅ লিংক কপি হয়েছে! বন্ধুদের সাথে শেয়ার করো।');
+                    }).catch(() => {
+                        prompt('🔗 এই লিংকটি কপি করে শেয়ার করো:', shareUrl);
+                    });
+                } else {
+                    prompt('🔗 এই লিংকটি কপি করে শেয়ার করো:', shareUrl);
+                }
+            }
+        }
+
+        const shareBtn = document.getElementById('shareBtn');
+        shareBtn.addEventListener('click', shareApp);
+        // Also listen for touchstart to ensure immediate burst on mobile
+        shareBtn.addEventListener('touchstart', (e) => {
+            const heartSvg = document.querySelector('.heart-svg');
+            if (heartSvg) {
+                heartSvg.classList.add('burst');
+                setTimeout(() => heartSvg.classList.remove('burst'), 500);
+            }
+        }, { passive: true });
+    </script>
+
+    <script>
+        // Black hole animation (fully retained from original)
         (function() {
             const canvas = document.getElementById('bgCanvas');
             const ctx = canvas.getContext('2d');
@@ -1007,11 +1118,5 @@
             animate();
         })();
     </script>
-                <button class="footer-link upi-link" id="shareBtn" title="এই অ্যাপটি শেয়ার করুন" onclick="shareApp()">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/>
-                </svg>
-                <span>Share &amp; Motivate</span>
-            </button>
 </body>
 </html>
